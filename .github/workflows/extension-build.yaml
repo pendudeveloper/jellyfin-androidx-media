@@ -17,16 +17,17 @@ jobs:
 
     steps:
       # ---------------------------
-      # Checkout, including submodules
+      # Checkout repository
       # ---------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           submodules: recursive
-          fetch-depth: 0   # IMPORTANT: avoids unadvertised object errors
+          fetch-depth: 0   # avoids unadvertised object errors
 
       # ---------------------------
-      # Install JDK 17
+      # Install JDK
       # ---------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -35,13 +36,13 @@ jobs:
           java-version: 17
 
       # ---------------------------
-      # Setup Gradle cache
+      # Setup Gradle caching
       # ---------------------------
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       # ---------------------------
-      # Cache NDK
+      # Cache NDK for faster builds
       # ---------------------------
       - name: Cache NDK
         uses: actions/cache@v4
@@ -66,14 +67,26 @@ jobs:
           ./build.sh
 
       # ---------------------------
-      # Build and publish extension
+      # Build the AAR (no Maven publish)
       # ---------------------------
-      - name: Build decoder and publish to Maven local
-        run: ./gradlew :media3-ffmpeg-decoder:publishToMavenLocal
+      - name: Build Media3 FFmpeg Decoder AAR
+        run: ./gradlew :media3-ffmpeg-decoder:assembleRelease
 
-      - name: Upload built AARs
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-decoder-aars
-          path: |
-            ~/.m2/repository/**/*.aar
+      # ---------------------------
+      # Copy AAR to repository
+      # ---------------------------
+      - name: Copy AARs into repo
+        run: |
+          mkdir -p output-aar
+          cp media3-ffmpeg-decoder/build/outputs/aar/*.aar output-aar/
+
+      # ---------------------------
+      # Commit AARs back into the repo
+      # ---------------------------
+      - name: Commit AARs to repository
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add output-aar
+          git commit -m "Add generated AARs" || echo "No changes to commit"
+          git push
