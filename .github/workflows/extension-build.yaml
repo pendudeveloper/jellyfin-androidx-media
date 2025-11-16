@@ -69,8 +69,8 @@ jobs:
       # ---------------------------
       # Build the AAR (no Maven publish)
       # ---------------------------
-      - name: Build Media3 FFmpeg Decoder AAR
-        run: ./gradlew :media3-ffmpeg-decoder:assembleRelease
+      - name: Build decoder and publish to Maven local
+        run: ./gradlew :media3-ffmpeg-decoder:publishToMavenLocal
 
       # ---------------------------
       # Copy AAR to repository
