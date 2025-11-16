@@ -14,26 +14,59 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-24.04
+
     steps:
+      # ---------------------------
+      # Checkout, including submodules
+      # ---------------------------
       - name: Checkout repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0   # IMPORTANT: avoids unadvertised object errors
+
+      # ---------------------------
+      # Install JDK 17
+      # ---------------------------
       - name: Setup Java
-        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
+      # ---------------------------
+      # Setup Gradle cache
+      # ---------------------------
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
+        uses: gradle/actions/setup-gradle@v4
+
+      # ---------------------------
+      # Cache NDK
+      # ---------------------------
       - name: Cache NDK
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        uses: actions/cache@v4
         with:
-          path: /usr/local/lib/android/sdk/ndk/${{ env.NDK_VER }}
-          key: ${{ runner.os }}-${{ env.NDK_VER }}
-      - name: Install correct NDK and CMake
-        run: sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;${NDK_VER}" "cmake;${CMAKE_VER}"
-      - name: Build ffmpeg
-        run: ./build.sh
-      - name: Build extension and publish library locally
+          path: ${{ env.ANDROID_SDK_ROOT }}/ndk/${{ env.NDK_VER }}
+          key: ndk-${{ env.NDK_VER }}
+
+      # ---------------------------
+      # Install NDK + CMake
+      # ---------------------------
+      - name: Install NDK and CMake
+        run: |
+          sudo ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager \
+            --install "ndk;${NDK_VER}" "cmake;${CMAKE_VER}"
+
+      # ---------------------------
+      # Build FFmpeg (your script)
+      # ---------------------------
+      - name: Build FFmpeg
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      # ---------------------------
+      # Build and publish extension
+      # ---------------------------
+      - name: Build decoder and publish to Maven local
         run: ./gradlew :media3-ffmpeg-decoder:publishToMavenLocal
