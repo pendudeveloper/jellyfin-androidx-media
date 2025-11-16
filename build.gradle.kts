@@ -29,7 +29,7 @@ allprojects {
         val android = extensions.findByType(LibraryExtension::class.java)
         if (android != null) {
             android.defaultConfig.minSdk = 21
-            android.ndkVersion = "26.1.10909125"
+            android.ndkVersion = "28.0.13004108"
         }
     }
 }
