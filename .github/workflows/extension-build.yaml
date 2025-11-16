@@ -1,10 +1,10 @@
 name: AndroidX Media3 FFmpeg Decoder / Build
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - master
-  pull_request:
+      - "**"
 
 env:
   NDK_VER: 28.0.13004108
