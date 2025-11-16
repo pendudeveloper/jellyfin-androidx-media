@@ -75,18 +75,12 @@ jobs:
       # ---------------------------
       # Copy AAR to repository
       # ---------------------------
-      - name: Copy AARs into repo
-        run: |
-          mkdir -p output-aar
-          cp media3-ffmpeg-decoder/build/outputs/aar/*.aar output-aar/
-
+       # ---------------------------
+      # Copy AAR to repository
       # ---------------------------
-      # Commit AARs back into the repo
-      # ---------------------------
-      - name: Commit AARs to repository
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add output-aar
-          git commit -m "Add generated AARs" || echo "No changes to commit"
-          git push
+      - name: Upload built AARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-decoder-aars
+          path: |
+            ~/.m2/repository/**/*.aar
