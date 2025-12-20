@@ -8,7 +8,7 @@ export ANDROID_NDK_PATH=$ANDROID_HOME/ndk/28.0.13004108
 export ANDROIDX_MEDIA_ROOT="${PWD}/media"
 export FFMPEG_MOD_PATH="${ANDROIDX_MEDIA_ROOT}/libraries/decoder_ffmpeg/src/main"
 export FFMPEG_PATH="${PWD}/ffmpeg"
-export ENABLED_DECODERS=(flac alac pcm_mulaw pcm_alaw pcm_s16le pcm_s16be pcm_f32le mp3 aac ac3 eac3 dca mlp truehd opus vorbis)
+export ENABLED_DECODERS=(vorbis opus flac alac pcm_mulaw pcm_alaw mp3 amrnb amrwb aac ac3 eac3 dca mlp truehd)
 
 # Create softlink to ffmpeg
 ln -sf "${FFMPEG_PATH}" "${FFMPEG_MOD_PATH}/jni/ffmpeg"
